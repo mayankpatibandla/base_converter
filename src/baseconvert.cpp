@@ -35,13 +35,13 @@ int main(int argc, char *argv[]) {
 
   value.erase(std::remove(value.begin(), value.end(), '_'), value.end());
 
-  bool is_signed = value.compare(0, 2, "-0") == 0;
-  if (is_signed) {
-    value.erase(0, 2);
-  } else if (value.compare(0, 1, "0") == 0) {
+  bool is_negative = value.compare(0, 1, "-") == 0;
+  if (is_negative) {
     value.erase(0, 1);
   }
-
+  if (value.size() > 1 && value.compare(0, 1, "0") == 0) {
+    value.erase(0, 1);
+  }
   if (value.empty()) {
     std::cerr
         << "Error: value cannot be empty after removing leading characters."
@@ -57,12 +57,8 @@ int main(int argc, char *argv[]) {
   } else {
     result = std::stoull(value, nullptr, 10);
   }
-
-  std::uint64_t max_value = 1ULL << nbits;
-
-  bool is_negative = is_signed && result & (1ULL << (nbits - 1));
   if (is_negative) {
-    result -= max_value;
+    result = -result;
   }
 
   std::ostringstream oss;
@@ -75,24 +71,27 @@ int main(int argc, char *argv[]) {
   }
   std::string output = oss.str();
 
+  // Debugging output
   if (argc > 4) {
     std::cout << "Value: " << value << std::endl;
     std::cout << "Base: " << base << std::endl;
     std::cout << "Nbits: " << nbits << std::endl;
-    std::cout << "Signed: " << (is_signed ? "true" : "false") << std::endl;
     std::cout << "Result: " << result << std::endl;
-    std::cout << "Max value: " << max_value << std::endl;
-    std::cout << "Is negative: " << (is_negative ? "true" : "false")
-              << std::endl;
+    std::cout << "Negative: " << std::boolalpha << is_negative << std::endl;
     std::cout << "Output: " << output << std::endl;
     std::cout << "Output size: " << output.size() << std::endl;
   }
 
-  std::size_t fill_size = nbits / std::ceil(std::log2(base));
-  if (output.size() > fill_size) {
-    output.erase(output.find_first_not_of('-'),
-                 output.size() - nbits / std::floor(std::log2(base)));
-    // output.insert(0, fill_size - output.size(), '0');
+  // Padding
+  if (base != 10) {
+    std::size_t fill_size = nbits / static_cast<std::size_t>(std::log2(base));
+    std::size_t erase_count = output.size() - fill_size;
+    if (erase_count > 1 && erase_count < output.size()) {
+      output.erase(output.find_first_not_of('-'), erase_count);
+    }
+    if (output.size() < fill_size) {
+      output.insert(0, fill_size - output.size(), '0');
+    }
   }
 
   std::cout << output << std::endl;

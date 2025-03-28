@@ -40,22 +40,23 @@ def run_test(case: TestCase) -> None:
     output = process.stdout.strip()
 
     try:
-        assert process.returncode == 0, f"Process failed with return code {process.returncode}"
+        assert process.returncode == 0, f"Process failed for {case}"
         result = output.splitlines()[-1]
         assert result == case.expected, f"Test failed for {case}, got {result}"
     except AssertionError:
         print(output)
+        print(process.stderr.strip())
         raise
 
 
-test_cases = (
-    # Test cases for binary  conversion
+test_cases = [
+    # Test cases for binary conversion
     TestCase("0b11111111", "11111111", 2),
     TestCase("0b11111111", "255", 10),
     TestCase("0b11111111", "FF", 16),
-    TestCase("-0b11111111", "11111111", 2),
-    TestCase("-0b11111111", "-1", 10),
-    TestCase("-0b11111111", "FF", 16),
+    TestCase("-0b00000001", "11111111", 2),
+    TestCase("-0b00000001", "-1", 10),
+    TestCase("-0b00000001", "FF", 16),
     # Test cases for decimal conversion
     TestCase("255", "11111111", 2),
     TestCase("255", "255", 10),
@@ -67,11 +68,28 @@ test_cases = (
     TestCase("0xFF", "11111111", 2),
     TestCase("0xFF", "255", 10),
     TestCase("0xFF", "FF", 16),
-    TestCase("-0xFF", "11111111", 2),
-    TestCase("-0xFF", "-1", 10),
-    TestCase("-0xFF", "FF", 16),
-)
+    TestCase("-0x1", "11111111", 2),
+    TestCase("-0x1", "-1", 10),
+    TestCase("-0x1", "FF", 16),
+    # Additional test cases
+    TestCase("0b00000000", "0", 10),
+    TestCase("0", "00000000", 2),
+    TestCase("0", "00", 16),
+    TestCase("42", "00101010", 2),
+    TestCase("-0x2a", "-42", 10),
+    TestCase("0b101010", "42", 10),
+    TestCase("0x2A", "00101010", 2),
+    TestCase("127", "01111111", 2, 8),
+    TestCase("128", "10000000", 2, 8),
+    TestCase("-128", "10000000", 2, 8),
+    TestCase("-1", "FFFFFFFF", 16, 32),
+    TestCase("1", "01", 16, 8),
+]
 
+test_cases += [TestCase(hex(i), str(i), 10) for i in range(0xFF)]
+test_cases += [TestCase(str(i), hex(i)[2:].zfill(2).upper(), 16) for i in range(0xFF)]
+test_cases += [TestCase(bin(i), str(i), 10) for i in range(0xFF)]
+test_cases += [TestCase(str(i), bin((i + (1 << 8)) & ((1 << 8) - 1))[2:].zfill(8), 2) for i in range(-0x80, 0)]
 
 if __name__ == "__main__":
     for test_case in test_cases:
