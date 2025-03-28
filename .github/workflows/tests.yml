@@ -8,11 +8,11 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Setup Python
       uses: actions/setup-python@v5.5.0
       with:
@@ -20,5 +20,13 @@ jobs:
 
     - name: Run make
       run: make
+
     - name: Run tests
       run: python3 tests/test.py
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4.6.2
+      with:
+        name: baseconvert.exe
+        path: baseconvert.exe
+        if-no-files-found: error
