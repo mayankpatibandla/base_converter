@@ -3,7 +3,7 @@
 import subprocess
 from dataclasses import dataclass
 
-EXE = "baseconvert.exe"
+EXE = "./baseconvert.exe"
 
 
 @dataclass
