@@ -12,7 +12,7 @@ build: $(OBJS)
 	@$(CC) $(CFLAGS) -o $(EXE) $(OBJS)
 
 $(OBJDIR)/%.o: %.cpp | $(OBJDIR)
-	@$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR):
 	@mkdir -p $(OBJDIR)
