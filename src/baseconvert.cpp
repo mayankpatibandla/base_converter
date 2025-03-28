@@ -13,8 +13,8 @@ int main(int argc, char *argv[]) {
   }
 
   std::uint32_t base = std::stoul(argv[2]);
-  if (base != 2 && base != 8 && base != 10 && base != 16) {
-    std::cerr << "Error: base must be 2, 8, 10, or 16." << std::endl;
+  if (base != 2 && base != 10 && base != 16) {
+    std::cerr << "Error: base must be 2, 10, or 16." << std::endl;
     return 1;
   }
 
@@ -49,21 +49,18 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  std::uint64_t raw;
+  std::int64_t result;
   if (value.compare(0, 1, "b") == 0) {
-    raw = std::stoull(value.substr(1), nullptr, 2);
-  } else if (value.compare(0, 1, "o") == 0) {
-    raw = std::stoull(value.substr(1), nullptr, 8);
+    result = std::stoull(value.substr(1), nullptr, 2);
   } else if (value.compare(0, 1, "x") == 0) {
-    raw = std::stoull(value.substr(1), nullptr, 16);
+    result = std::stoull(value.substr(1), nullptr, 16);
   } else {
-    raw = std::stoull(value.substr(1), nullptr, 10);
+    result = std::stoull(value, nullptr, 10);
   }
 
-  std::int64_t result = static_cast<std::int64_t>(raw);
   std::uint64_t max_value = 1ULL << nbits;
 
-  bool is_negative = is_signed && raw & (1ULL << (nbits - 1));
+  bool is_negative = is_signed && result & (1ULL << (nbits - 1));
   if (is_negative) {
     result -= max_value;
   }
@@ -71,36 +68,28 @@ int main(int argc, char *argv[]) {
   std::ostringstream oss;
   if (base == 2) {
     oss << std::bitset<64>(result);
-  } else if (base == 8) {
-    oss << std::oct << result;
   } else if (base == 10) {
     oss << result;
   } else if (base == 16) {
-    oss << std::hex << result;
+    oss << std::uppercase << std::hex << result;
   }
-
-  // std::cout << "Value: " << value << std::endl;
-  // std::cout << "Base: " << base << std::endl;
-  // std::cout << "Nbits: " << nbits << std::endl;
-  // std::cout << "Signed: " << (is_signed ? "true" : "false") << std::endl;
-  // std::cout << "Result: " << result << std::endl;
-  // std::cout << "Max value: " << max_value << std::endl;
-  // std::cout << "Is negative: " << (is_negative ? "true" : "false") <<
-  // std::endl; std::cout << "Raw: " << raw << std::endl; std::cout << "Output:
-  // " << oss.str() << std::endl; std::cout << "Output size: " <<
-  // oss.str().size() << std::endl;
-
   std::string output = oss.str();
-  if (output.size() > nbits) {
-    output.erase(output.find_first_not_of('-'), output.size() - nbits);
-  }
-  if (output.empty()) {
-    output = "0";
-  }
 
-  std::size_t fill_size = (nbits / std::ceil(std::log2(base)));
-  if (output.size() < fill_size) {
-    output.insert(0, fill_size - output.size(), '0');
+  std::cout << "Value: " << value << std::endl;
+  std::cout << "Base: " << base << std::endl;
+  std::cout << "Nbits: " << nbits << std::endl;
+  std::cout << "Signed: " << (is_signed ? "true" : "false") << std::endl;
+  std::cout << "Result: " << result << std::endl;
+  std::cout << "Max value: " << max_value << std::endl;
+  std::cout << "Is negative: " << (is_negative ? "true" : "false") << std::endl;
+  std::cout << "Output: " << output << std::endl;
+  std::cout << "Output size: " << output.size() << std::endl;
+
+  std::size_t fill_size = nbits / std::ceil(std::log2(base));
+  if (output.size() > fill_size) {
+    output.erase(output.find_first_not_of('-'),
+                 output.size() - nbits / std::floor(std::log2(base)));
+    // output.insert(0, fill_size - output.size(), '0');
   }
 
   std::cout << output << std::endl;
