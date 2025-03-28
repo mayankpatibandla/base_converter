@@ -35,7 +35,7 @@ def run_test(case: TestCase) -> None:
     :rtype: None
     """
 
-    args = EXE, case.input, str(case.base), str(case.nbits)
+    args = EXE, case.input, str(case.base), str(case.nbits), ""
     process = subprocess.run(args, capture_output=True, text=True, check=False)
     output = process.stdout.strip()
 

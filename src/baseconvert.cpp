@@ -75,15 +75,18 @@ int main(int argc, char *argv[]) {
   }
   std::string output = oss.str();
 
-  std::cout << "Value: " << value << std::endl;
-  std::cout << "Base: " << base << std::endl;
-  std::cout << "Nbits: " << nbits << std::endl;
-  std::cout << "Signed: " << (is_signed ? "true" : "false") << std::endl;
-  std::cout << "Result: " << result << std::endl;
-  std::cout << "Max value: " << max_value << std::endl;
-  std::cout << "Is negative: " << (is_negative ? "true" : "false") << std::endl;
-  std::cout << "Output: " << output << std::endl;
-  std::cout << "Output size: " << output.size() << std::endl;
+  if (argc > 4) {
+    std::cout << "Value: " << value << std::endl;
+    std::cout << "Base: " << base << std::endl;
+    std::cout << "Nbits: " << nbits << std::endl;
+    std::cout << "Signed: " << (is_signed ? "true" : "false") << std::endl;
+    std::cout << "Result: " << result << std::endl;
+    std::cout << "Max value: " << max_value << std::endl;
+    std::cout << "Is negative: " << (is_negative ? "true" : "false")
+              << std::endl;
+    std::cout << "Output: " << output << std::endl;
+    std::cout << "Output size: " << output.size() << std::endl;
+  }
 
   std::size_t fill_size = nbits / std::ceil(std::log2(base));
   if (output.size() > fill_size) {
